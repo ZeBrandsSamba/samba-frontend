@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Home from '../views/Home.vue';
-import Survey from '../views/Survey.vue';
 import Dashboard from '../views/Dashboard.vue'
+import Home from '../views/Home.vue';
+import Responses from '../views/Responses.vue';
+import Survey from '../views/Survey.vue';
 
 const routes = [
     {
@@ -12,6 +13,10 @@ const routes = [
     {
         path: '/dashboard',
         component: Dashboard,
+    },
+    {
+        path: '/responses',
+        component: Responses,
     },
     {
         path: '/survey',
