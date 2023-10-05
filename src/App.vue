@@ -6,7 +6,7 @@ import Sidebar from './components/Sidebar.vue'
 <template>
   <div style="display: flex; ">
     <Sidebar />
-    <span style="margin: 5px;">
+    <span style="margin: 12px;">
       <router-view />
     </span>
   </div>
