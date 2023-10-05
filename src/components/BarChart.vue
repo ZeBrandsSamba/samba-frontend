@@ -13,7 +13,7 @@ export default defineComponent({
   name: 'Home',
   components: { BarChart },
   setup() {
-    const testData = {
+    const barData = {
       labels: ['Paris', 'Nîmes', 'Toulon', 'Perpignan', 'Autre'],
       datasets: [
         {
