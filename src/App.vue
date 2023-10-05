@@ -5,7 +5,7 @@ import Sidebar from './components/Sidebar.vue'
 
 <template>
   <div style="display: flex; ">
-    <Sidebar />
+    <Sidebar v-if="!$route.meta.fullPage" />
     <span style="margin: 12px;">
       <router-view />
     </span>
