@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "chart.js": "^3.1.0",
     "vue": "^3.3.4",
+    "vue-chart-3": "^3.1.8",
     "vue-router": "^4.2.5",
     "vuestic-ui": "^1.8.0"
   },
