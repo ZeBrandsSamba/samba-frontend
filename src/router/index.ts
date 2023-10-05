@@ -21,6 +21,9 @@ const routes = [
     {
         path: '/survey',
         component: Survey,
+        meta: {
+            fullPage: true,
+        },
     },
 ];
 
