@@ -17,3 +17,4 @@ export const DETRACTORS_LABEL = 'Detractors';
 export const PASSIVES_LABEL = 'Passives';
 export const SURVEYS_ANSWERED_LABEL = 'Answered';
 export const SURVEYS_NOT_ANSWERED_LABEL = 'Did not answer';
+
