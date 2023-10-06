@@ -1,19 +1,73 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
+import { DoughnutChart } from 'vue-chart-3';
+import { Chart, registerables } from "chart.js";
+
 import SambaRequests from '../services/samba-requests';
+import { getLastYear, formatDateForSupabase } from '../util/dates';
+import {
+  SURVEYS_ANSWERED_CHART_TITLE,
+  SURVEYS_ANSWERED_LABEL,
+  SURVEYS_NOT_ANSWERED_LABEL,
+  SURVEY_ANSWERED_COLOR,
+  SURVEY_NOT_ANSWERED_COLOR,
+} from '../config/constants';
+
+Chart.register(...registerables);
 
 const requests = new SambaRequests();
 
-const users: any = ref([]);
-const range: any = ref({ start: null, end: null});
+const range: any = ref({
+  start: getLastYear(),
+  end: new Date(),
+});
 
-const fetchUsers = async () => {
-  users.value = await requests.get({ path: 'users' });
+const surveyTotalsChartOptions: any = ref({
+  plugins: {
+    title: {
+      display: true,
+      text: SURVEYS_ANSWERED_CHART_TITLE,
+    },
+  },
+});
+
+const surveyTotalsChartData: any = ref({});
+
+const fetchSurveyTotals = async () => {
+  const startDate = range.value.start;
+  const endDate = range.value.end;
+  if (!startDate || !endDate) return null;
+
+  const surveyTotalsData: any = await requests.get({
+    path: `get_surveys_sent_and_answered?lower_limit_date=${formatDateForSupabase(startDate)}&upper_limit_date=${formatDateForSupabase(endDate)}`,
+  });
+  return surveyTotalsData;
+};
+
+const updateSurveyTotalsChart = (surveyTotals: any) => {
+  const answered = surveyTotals.total_surveys_answered;
+  const total = surveyTotals.total_surveys_sent;
+
+  const answeredPercentage = Math.round(100 * answered / total);
+  const notAnsweredPercentage = 100 - answeredPercentage;
+
+  surveyTotalsChartData.value = {
+    labels: [SURVEYS_ANSWERED_LABEL, SURVEYS_NOT_ANSWERED_LABEL],
+    datasets: [{
+      data: [answeredPercentage, notAnsweredPercentage],
+      backgroundColor: [SURVEY_ANSWERED_COLOR, SURVEY_NOT_ANSWERED_COLOR],
+    }],
+  };
+};
+
+const updateCharts = async () => {
+  const surveyTotals = await fetchSurveyTotals();
+  if (surveyTotals) updateSurveyTotalsChart(surveyTotals);
 };
 
 onMounted(() => {
-  fetchUsers();
+  updateCharts();
 });
 </script>
 
@@ -36,24 +90,8 @@ onMounted(() => {
         </template>
       </va-collapse>
     </div>
-    <va-card
-      v-for="user in users"
-      :key="user.id"
-      stripe
-      stripe-color="primary"
-      style="margin: 8px 0;"
-    >
-      <va-card-title>
-        {{ user.name }}
-      </va-card-title>
-      <va-card-content>
-        {{ user.company.bs }}
-        {{ user.company.bs }}
-        {{ user.company.bs }}
-        {{ user.company.bs }}
-        {{ user.company.bs }}
-        {{ user.company.bs }}
-      </va-card-content>
-    </va-card>
+    <div style="width: 100%; margin: 12px 0;">
+      <doughnut-chart :options="surveyTotalsChartOptions" :chartData="surveyTotalsChartData" />
+    </div>
   </div>
 </template>
