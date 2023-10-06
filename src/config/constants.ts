@@ -1,4 +1,4 @@
-export const BACKEND_URL = 'http://35.245.95.30:8000';
+export const BACKEND_URL = 'http://35.245.133.115:8000';
 
 export const NPS_LINE_COLOR = '#3944bc';
 export const PROMOTERS_BAR_COLOR = '#77dd77';

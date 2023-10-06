@@ -6,6 +6,7 @@ import { Chart, registerables } from "chart.js";
 
 import SambaRequests from '../services/samba-requests';
 import { getLastYear, formatDateForSupabase } from '../util/dates';
+import { colorForClientScore } from '../util/nps';
 import {
   SURVEYS_ANSWERED_CHART_TITLE,
   SURVEYS_ANSWERED_LABEL,
@@ -31,8 +32,8 @@ const surveyTotalsChartOptions: any = ref({
     },
   },
 });
-
 const surveyTotalsChartData: any = ref({});
+const customerAnswers: any = ref([]);
 
 const fetchSurveyTotals = async () => {
   const startDate = range.value.start;
@@ -43,6 +44,17 @@ const fetchSurveyTotals = async () => {
     path: `get_surveys_sent_and_answered?lower_limit_date=${formatDateForSupabase(startDate)}&upper_limit_date=${formatDateForSupabase(endDate)}`,
   });
   return surveyTotalsData;
+};
+
+const fetchCustomerFeedback = async () => {
+  const startDate = range.value.start;
+  const endDate = range.value.end;
+  if (!startDate || !endDate) return null;
+
+  const customerFeedback: any = await requests.get({
+    path: `get_customer_feedback?lower_limit_date=${formatDateForSupabase(startDate)}&upper_limit_date=${formatDateForSupabase(endDate)}`,
+  });
+  return customerFeedback;
 };
 
 const updateSurveyTotalsChart = (surveyTotals: any) => {
@@ -61,9 +73,15 @@ const updateSurveyTotalsChart = (surveyTotals: any) => {
   };
 };
 
+const updateCustomerFeedback = (customerFeedback: any) => {
+  customerAnswers.value = customerFeedback;
+};
+
 const updateCharts = async () => {
   const surveyTotals = await fetchSurveyTotals();
   if (surveyTotals) updateSurveyTotalsChart(surveyTotals);
+  const customerFeedback = await fetchCustomerFeedback();
+  if (customerFeedback) updateCustomerFeedback(customerFeedback);
 };
 
 onMounted(() => {
@@ -93,6 +111,24 @@ onMounted(() => {
     </div>
     <div style="width: 100%; margin: 12px 0;">
       <doughnut-chart :options="surveyTotalsChartOptions" :chartData="surveyTotalsChartData" />
+    </div>
+    <div>
+      <va-card
+        v-for="(answer, idx) in customerAnswers"
+        :key="idx"
+        stripe
+        :stripe-color="colorForClientScore(answer.score)"
+        style="margin-top: 12px;"
+      >
+        <va-card-title>
+          {{ answer.customer_name }} &nbsp;
+        </va-card-title>
+        <va-card-content>
+          <p>Score: {{ answer.score }} &nbsp; {{ answer.multiple_choice_answer }}</p>
+          <p>{{ answer.text_answer }}</p>
+        </va-card-content>
+      </va-card>
+      {{ customerAnswers }}
     </div>
   </div>
 </template>
