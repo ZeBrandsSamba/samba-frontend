@@ -31,8 +31,14 @@ onMounted(() => {
   fetchQuestions();
 });
 
-const sendOptionSelected = async () => {
-  var response: any = await requests.post({path:"save_survey_response"}, {score, order_number})
+const sendOptionSelected = async (option: any) => {
+  var response: any = await requests.post({path:"save_survey_response"}, {
+    score: score.value, 
+    order_number: order_number.value,
+    multiple_choice_answer: option,
+    text_answer: ""
+    }
+  )
   console.log(response)
 };
 </script>
@@ -52,6 +58,7 @@ const sendOptionSelected = async () => {
               <va-textarea
                   autosize
                   placeholder="Start typing"
+                  id="text_answer"
                 />
             </va-card-content>
           </va-card>
@@ -63,7 +70,7 @@ const sendOptionSelected = async () => {
             <va-card-content>
               <ul>
                 <li v-for="option in options">
-                  <va-chip to="/" @click="sendOptionSelected" outline size="large" class="mr-6 mb-3">
+                  <va-chip to="/" @click="sendOptionSelected(option)" outline size="large" class="mr-6 mb-3">
                     {{ option }}
                   </va-chip>
                 </li>
