@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
-import { BarChart, DoughnutChart } from 'vue-chart-3';
+import { BarChart, DoughnutChart, LineChart } from 'vue-chart-3';
 import { Chart, registerables } from "chart.js";
 
 import SambaRequests from '../services/samba-requests';
 import { getLastYear } from '../util/dates';
+import { calculateNps } from '../util/nps';
 import {
+  NPS_LINE_COLOR,
   PROMOTERS_BAR_COLOR,
   DETRACTORS_BAR_COLOR,
   PASSIVES_BAR_COLOR,
+  NPS_LINE_CHART_TITLE,
   HISTORIC_NPS_CHART_TITLE,
   PERCENTAGE_NPS_CHART_TITLE,
   PROMOTERS_LABEL,
@@ -25,6 +28,8 @@ const range: any = ref({
   start: getLastYear(),
   end: new Date(),
 });
+
+const npsLineChartData: any = ref({});
 
 const historicNpsChartData: any = ref({});
 const historicNpsChartOptions = ref({
@@ -66,6 +71,20 @@ const fetchNpsHistoricData = async () => {
   return npsData;
 };
 
+const updateNpsLineChart = async (npsData: any) => {
+  const npsLineChartDatasets = [
+    {
+      label: NPS_LINE_CHART_TITLE,
+      data: npsData.map((x) => calculateNps(x)),
+      borderColor: NPS_LINE_COLOR,
+    }
+  ];
+  npsLineChartData.value = {
+    labels: npsData.map((x: any) => `${x.month}/${x.year}`),
+    datasets: npsLineChartDatasets,
+  };
+};
+
 const updateHistoricNpsChart = async (npsData: any) => {
   const npsHistoricChartDatasets = [
     {
@@ -95,7 +114,6 @@ const updatePercentageNpsChart = (npsData: any) => {
   const passives = npsData.reduce((acc: any, data: any) => acc + data.passives, 0);
   const detractors = npsData.reduce((acc: any, data: any) => acc + data.detractors, 0);
   const totalClients = promoters + passives + detractors;
-  console.log({ promoters, passives, detractors });
 
   const promotersPercentage = Math.round(100 * promoters / totalClients);
   const passivesPercentage = Math.round(100 * passives / totalClients);
@@ -113,6 +131,7 @@ const updatePercentageNpsChart = (npsData: any) => {
 const updateCharts = async () => {
   const npsData = await fetchNpsHistoricData();
   if (!npsData) return;
+  updateNpsLineChart(npsData);
   updateHistoricNpsChart(npsData);
   updatePercentageNpsChart(npsData);
 };
@@ -139,6 +158,9 @@ onMounted(() => {
     </div>
     <br />
     <div style="width: 100%; margin: 12px 0; display: flex;">
+      <div>
+        <line-chart :chartData="npsLineChartData" />
+      </div>
       <div>
         <bar-chart :options="historicNpsChartOptions" :chartData="historicNpsChartData" />
       </div>
