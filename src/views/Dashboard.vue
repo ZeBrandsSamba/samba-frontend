@@ -124,6 +124,9 @@ onMounted(() => {
 
 <template>
   <div>
+    <h1 style="margin: 15px 0; font-size: large">
+      NPS data {{ range.start && range.end ? `from ${range.start.toDateString()} upto ${range.end.toDateString()}` : '' }}
+    </h1>
     <div style="width: 270px; border: 1px solid #779ecb; border-radius: 5px;">
       <va-collapse header="Select date range">
         <va-date-picker
@@ -135,7 +138,7 @@ onMounted(() => {
       </va-collapse>
     </div>
     <br />
-    <div style="width: 100%; margin: 12px 0; display: flex; justify-content: end;">
+    <div style="width: 100%; margin: 12px 0; display: flex;">
       <div>
         <bar-chart :options="historicNpsChartOptions" :chartData="historicNpsChartData" />
       </div>
