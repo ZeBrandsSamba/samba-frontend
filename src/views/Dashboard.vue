@@ -75,7 +75,7 @@ const updateNpsLineChart = async (npsData: any) => {
   const npsLineChartDatasets = [
     {
       label: NPS_LINE_CHART_TITLE,
-      data: npsData.map((x) => calculateNps(x)),
+      data: npsData.map((x: any) => calculateNps(x)),
       borderColor: NPS_LINE_COLOR,
     }
   ];
