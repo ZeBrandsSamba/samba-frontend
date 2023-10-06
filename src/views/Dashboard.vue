@@ -55,6 +55,8 @@ const percentageNpsChartOptions: any = ref({
   },
 });
 
+const npsTableData: any = ref([]);
+
 const fetchNpsHistoricData = async () => {
   const startDate = range.value.start;
   const endDate = range.value.end;
@@ -128,23 +130,40 @@ const updatePercentageNpsChart = (npsData: any) => {
   };
 };
 
-const updateCharts = async () => {
+const updateNpsTable = (npsData: any) => {
+  npsTableData.value = npsData.map((monthData: any, idx: number, allData: any) => ({
+    month: `${monthData.month}/${monthData.year}`,
+    nps: Math.round(calculateNps(monthData)),
+    changeFromLastMonth: idx == 0 ? 0 : Math.round(calculateNps(allData[idx])) - Math.round(calculateNps(allData[idx-1])),
+    totalCustomers: monthData.promoters + monthData.passives + monthData.detractors,
+    promoters: monthData.promoters,
+    detractors: monthData.detractors,
+  }));
+};
+
+const updateChartsAndTables = async () => {
   const npsData = await fetchNpsHistoricData();
   if (!npsData) return;
   updateNpsLineChart(npsData);
   updateHistoricNpsChart(npsData);
   updatePercentageNpsChart(npsData);
+  updateNpsTable(npsData);
 };
 
 onMounted(() => {
-  updateCharts();
+  updateChartsAndTables();
 });
 </script>
 
 <template>
   <div>
     <h1 style="margin: 15px 0; font-size: large">
-      NPS data {{ range.start && range.end ? `from ${range.start.toDateString()} upto ${range.end.toDateString()}` : '' }}
+      NPS data
+      {{
+        range.start && range.end
+        ? `from ${range.start.getMonth()+1}/${range.start.getFullYear()} upto ${range.end.getMonth()+1}/${range.end.getFullYear()}`
+        : ''
+      }}
     </h1>
     <div style="width: 270px; border: 1px solid #779ecb; border-radius: 5px;">
       <va-collapse header="Select date range">
@@ -152,7 +171,7 @@ onMounted(() => {
           v-model="range"
           mode="range"
           type="month"
-          @update:modelValue="updateCharts"
+          @update:modelValue="updateChartsAndTables"
         ></va-date-picker>
       </va-collapse>
     </div>
@@ -168,5 +187,49 @@ onMounted(() => {
         <doughnut-chart :options="percentageNpsChartOptions" :chartData="percentageNpsChartData" />
       </div>
     </div>
+    <div class="va-table-responsive">
+      <table class="va-table va-table--striped va-table--hoverable">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>NPS</th>
+            <th>Total customers</th>
+            <th>Promoters</th>
+            <th>Detractors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in npsTableData" :key="row.month">
+            <td>{{ row.month }}</td>
+            <td>
+              {{ row.nps }} % &nbsp;
+              <va-chip
+                size="small"
+                :color="row.changeFromLastMonth === 0 ? PASSIVES_BAR_COLOR : (
+                  row.changeFromLastMonth > 0 ? PROMOTERS_BAR_COLOR : DETRACTORS_BAR_COLOR
+                )"
+              >
+                {{ row.changeFromLastMonth > 0 ? '+' : '' }} {{ row.changeFromLastMonth }}
+              </va-chip>
+            </td>
+            <td class="text-align-right">
+              {{ row.totalCustomers }}
+            </td>
+            <td class="text-align-right">
+              {{ row.promoters }}
+            </td>
+            <td class="text-align-right">
+              {{ row.detractors }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
+
+<style>
+.text-align-right {
+  text-align: right !important;
+}
+</style>
