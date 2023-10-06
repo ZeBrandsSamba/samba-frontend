@@ -86,6 +86,7 @@ onMounted(() => {
             mode="range"
             stripe
             stripe-color="success"
+            @update:modelValue="updateCharts"
           />
         </template>
       </va-collapse>
