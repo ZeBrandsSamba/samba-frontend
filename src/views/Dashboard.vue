@@ -32,7 +32,7 @@ const range: any = ref({
 const npsLineChartData: any = ref({});
 
 const historicNpsChartData: any = ref({});
-const historicNpsChartOptions = ref({
+const historicNpsChartOptions: any = ref({
   plugins: {
     title: {
       display: true,
@@ -46,7 +46,7 @@ const historicNpsChartOptions = ref({
 });
 
 const percentageNpsChartData: any = ref({});
-const percentageNpsChartOptions = ref({
+const percentageNpsChartOptions: any = ref({
   plugins: {
     title: {
       display: true,
