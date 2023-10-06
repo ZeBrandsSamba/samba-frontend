@@ -23,7 +23,7 @@ const range: any = ref({
   end: new Date(),
 });
 
-const surveyTotalsChartOptions = ref({
+const surveyTotalsChartOptions: any = ref({
   plugins: {
     title: {
       display: true,
@@ -32,7 +32,7 @@ const surveyTotalsChartOptions = ref({
   },
 });
 
-const surveyTotalsChartData = ref({});
+const surveyTotalsChartData: any = ref({});
 
 const fetchSurveyTotals = async () => {
   const startDate = range.value.start;
