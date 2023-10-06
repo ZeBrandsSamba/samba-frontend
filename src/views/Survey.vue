@@ -30,6 +30,11 @@ const steps = [
 onMounted(() => {
   fetchQuestions();
 });
+
+const sendOptionSelected = async () => {
+  var response: any = await requests.post({path:"save_survey_response"}, {score, order_number})
+  console.log(response)
+};
 </script>
 
 <template>
@@ -58,7 +63,7 @@ onMounted(() => {
             <va-card-content>
               <ul>
                 <li v-for="option in options">
-                  <va-chip href="https://google.com" outline size="large" class="mr-6 mb-3">
+                  <va-chip to="/" @click="sendOptionSelected" outline size="large" class="mr-6 mb-3">
                     {{ option }}
                   </va-chip>
                 </li>
