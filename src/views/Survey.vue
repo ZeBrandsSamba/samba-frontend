@@ -6,6 +6,7 @@ import SambaRequests from '../services/samba-requests';
 
 
 var query_string = useRouter().currentRoute.value.query
+var text_answer = ""
 const requests = new SambaRequests();
 const question_position_1: any = ref("");
 const question_position_2: any = ref("");
@@ -36,10 +37,10 @@ const sendOptionSelected = async (option: any) => {
     score: score.value, 
     order_number: order_number.value,
     multiple_choice_answer: option,
-    text_answer: ""
+    text_answer: text_answer
     }
   )
-  console.log(response)
+  return response
 };
 </script>
 
@@ -58,7 +59,7 @@ const sendOptionSelected = async (option: any) => {
               <va-textarea
                   autosize
                   placeholder="Start typing"
-                  id="text_answer"
+                  v-model="text_answer"
                 />
             </va-card-content>
           </va-card>
